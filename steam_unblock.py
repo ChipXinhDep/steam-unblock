@@ -214,9 +214,12 @@ class App:
                              lambda: self.actions.put(self.toggle)),
             pystray.MenuItem("Quit", lambda: self.actions.put(self.quit)),
         ))
-        self.tray.run_detached()
+        # start() first: pystray caches the icon it shows first and misses a change made during setup,
+        # which left the icon gray while running.
         self.start()
-        self.poll()
+        if self.alive:
+            self.tray.run_detached()
+            self.poll()
 
     def poll(self):
         while self.alive and not self.actions.empty():
@@ -244,7 +247,8 @@ class App:
                 asyncio.start_server(handle, "127.0.0.1", PORT), self.loop).result()
         except OSError:
             messagebox.showerror("Steam Unblock", f"Port {PORT} is busy. Is Steam Unblock already running?")
-            self.tray.stop()
+            if self.tray.visible:
+                self.tray.stop()
             self.alive = False
             self.root.destroy()
             return
