@@ -1,0 +1,26 @@
+# Push a tag like v1.0.0 to build SteamUnblock.exe and attach it to a GitHub Release.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt pyinstaller
+      - run: python steam_unblock.py --test
+      - run: python -m PyInstaller --onefile --windowed --hidden-import pystray._win32 --name SteamUnblock steam_unblock.py
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/SteamUnblock.exe
+            THIRD_PARTY_NOTICES.md
