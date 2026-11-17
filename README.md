@@ -33,7 +33,7 @@ Nếu đúng như vậy, nhiều khả năng nhà mạng đang chặn Steam theo
 ### Khay hệ thống
 
 - Bấm nút thu nhỏ (–): cửa sổ ẩn xuống khay hệ thống, app vẫn chạy.
-- Biểu tượng **chấm xanh** = đang chạy, **chấm xám** = đã dừng.
+- Biểu tượng **ổ khóa mở trên nền xanh** = đang chạy, **ổ khóa đóng trên nền xám** = đã dừng.
 - **Bấm** vào biểu tượng để mở lại cửa sổ. **Chuột phải** để chọn **Show / Stop (Start) / Quit**.
 - Trên Windows 11, biểu tượng có thể nằm trong mục **^** (ẩn). Kéo nó ra thanh taskbar nếu muốn luôn thấy.
 
@@ -88,7 +88,7 @@ pip install -r requirements.txt
 python steam_unblock.py          # chạy app
 python steam_unblock.py --test   # tự kiểm tra
 pip install pyinstaller
-python -m PyInstaller --onefile --windowed --hidden-import pystray._win32 --name SteamUnblock steam_unblock.py
+python -m PyInstaller --onefile --windowed --hidden-import pystray._win32 --add-data "assets;assets" --name SteamUnblock steam_unblock.py
 ```
 
 File `.exe` trong Releases được GitHub Actions build tự động từ mã nguồn này

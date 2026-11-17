@@ -9,6 +9,7 @@ The released `SteamUnblock.exe` bundles the following components.
 | Pillow | MIT-CMU (HPND) | https://github.com/python-pillow/Pillow |
 | six (pystray dependency) | MIT | https://github.com/benjaminp/six |
 | PyInstaller bootloader | GPL-2.0 with bootloader exception | https://github.com/pyinstaller/pyinstaller |
+| Tray padlock icons (`assets/`), from Kenney "Game Icons" | CC0 1.0 | https://kenney.nl/assets/game-icons |
 
 ## pystray (LGPL-3.0)
 

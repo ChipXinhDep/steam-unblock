@@ -9,10 +9,11 @@ settings while the app runs. Everything else (games, other sites) stays DIRECT.
 Stopping or closing the app restores the previous Windows setting.
 
 Needs:  pip install pystray pillow
-Build the .exe:  python -m PyInstaller --onefile --windowed --hidden-import pystray._win32 --name SteamUnblock steam_unblock.py
+Build the .exe:  python -m PyInstaller --onefile --windowed --hidden-import pystray._win32 --add-data "assets;assets" --name SteamUnblock steam_unblock.py
 """
 import asyncio
 import ctypes
+import os
 import queue
 import sys
 import threading
@@ -171,9 +172,16 @@ def self_test():
     print("self-test OK")
 
 
-def tray_image(color):
+# Inside a PyInstaller exe, bundled files are unpacked to sys._MEIPASS.
+ASSETS = os.path.join(getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__))), "assets")
+
+
+def tray_image(color, icon):
+    """Status-colored circle with a white Kenney padlock (assets/, CC0) on top."""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-    ImageDraw.Draw(img).ellipse((6, 6, 58, 58), fill=color)
+    ImageDraw.Draw(img).ellipse((0, 0, 63, 63), fill=color)
+    glyph = Image.open(os.path.join(ASSETS, icon)).convert("RGBA").resize((40, 40), Image.LANCZOS)
+    img.alpha_composite(glyph, (12, 12))
     return img
 
 
@@ -200,7 +208,7 @@ class App:
 
         # Tray callbacks run on pystray's thread and Tk is not thread-safe: queue them, Tk polls.
         self.actions = queue.SimpleQueue()
-        self.tray = pystray.Icon("SteamUnblock", tray_image("#888888"), "Steam Unblock", menu=pystray.Menu(
+        self.tray = pystray.Icon("SteamUnblock", tray_image("#888888", "locked.png"), "Steam Unblock", menu=pystray.Menu(
             pystray.MenuItem("Show", lambda: self.actions.put(self.show), default=True),
             pystray.MenuItem(lambda item: "Stop" if self.server else "Start",
                              lambda: self.actions.put(self.toggle)),
@@ -225,8 +233,8 @@ class App:
         self.root.lift()
         self.root.focus_force()
 
-    def set_tray(self, color, title):
-        self.tray.icon = tray_image(color)
+    def set_tray(self, color, icon, title):
+        self.tray.icon = tray_image(color, icon)
         self.tray.title = title
         self.tray.update_menu()
 
@@ -245,7 +253,7 @@ class App:
         self.status.config(text="Running: Steam Store unblocked.\nRestart Steam once if it still shows -101.",
                            fg="#1a7f37")
         self.button.config(text="Stop")
-        self.set_tray("#1a7f37", "Steam Unblock: running")
+        self.set_tray("#1a7f37", "unlocked.png", "Steam Unblock: running")
 
     def stop(self):
         if self.server:
@@ -255,7 +263,7 @@ class App:
             self.server = None
         self.status.config(text="Stopped. Windows proxy setting restored.", fg="#555555")
         self.button.config(text="Start")
-        self.set_tray("#888888", "Steam Unblock: stopped")
+        self.set_tray("#888888", "locked.png", "Steam Unblock: stopped")
 
     def toggle(self):
         self.stop() if self.server else self.start()

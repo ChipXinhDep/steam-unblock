@@ -31,7 +31,7 @@ The proxy also refuses any request that is not for those domains.
 
 1. Download `SteamUnblock.exe` from [Releases](../../releases) and run it.
 2. Restart Steam once.
-3. Minimize to send it to the tray (green dot = running, gray = stopped).
+3. Minimize to send it to the tray (open padlock on green = running, closed padlock on gray = stopped).
    Right-click the tray icon for Show / Stop / Quit.
 
 **What it changes on your PC:** while running, it sets the Windows "automatic proxy
@@ -56,7 +56,7 @@ pip install -r requirements.txt
 python steam_unblock.py          # run
 python steam_unblock.py --test   # self-test
 pip install pyinstaller
-python -m PyInstaller --onefile --windowed --hidden-import pystray._win32 --name SteamUnblock steam_unblock.py
+python -m PyInstaller --onefile --windowed --hidden-import pystray._win32 --add-data "assets;assets" --name SteamUnblock steam_unblock.py
 ```
 
 ## Disclaimer
