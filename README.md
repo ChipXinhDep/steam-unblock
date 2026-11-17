@@ -1,4 +1,6 @@
-# Unblock for Steam
+# Steam Unblock
+
+**[Tiếng Việt: giải thích và hướng dẫn sử dụng](README.vi.md)**
 
 A small Windows tray app that gets the Steam Store and Community pages working again
 when an ISP blocks them, **without a VPN and without touching games or any other traffic.**
@@ -55,13 +57,6 @@ python steam_unblock.py --test   # self-test
 pip install pyinstaller
 python -m PyInstaller --onefile --windowed --hidden-import pystray._win32 --name SteamUnblock steam_unblock.py
 ```
-
-## Tiếng Việt (tóm tắt)
-
-Ứng dụng khay hệ thống giúp mở lại Steam Store / Community khi nhà mạng chặn (lỗi **-101**),
-không cần VPN và **chỉ áp dụng cho các trang của Steam**, không ảnh hưởng game hay các trang khác.
-Tải `SteamUnblock.exe` ở mục Releases, chạy, rồi khởi động lại Steam một lần.
-Đóng app sẽ trả lại cài đặt proxy của Windows như cũ.
 
 ## Disclaimer
 
