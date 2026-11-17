@@ -158,6 +158,38 @@ def set_pac(url):
     return old
 
 
+RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+RUN_NAME = "SteamUnblock"
+
+
+def startup_command():
+    """Command Windows runs at login: this exe (or pythonw + this script), starting hidden in the tray."""
+    if getattr(sys, "frozen", False):
+        return f'"{sys.executable}" --minimized'
+    pythonw = os.path.join(os.path.dirname(sys.executable), "pythonw.exe")
+    return f'"{pythonw}" "{os.path.abspath(__file__)}" --minimized'
+
+
+def get_startup():
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as key:
+            winreg.QueryValueEx(key, RUN_NAME)
+        return True
+    except FileNotFoundError:
+        return False
+
+
+def set_startup(on):
+    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0, winreg.KEY_SET_VALUE) as key:
+        if on:
+            winreg.SetValueEx(key, RUN_NAME, 0, winreg.REG_SZ, startup_command())
+        else:
+            try:
+                winreg.DeleteValue(key, RUN_NAME)
+            except FileNotFoundError:
+                pass
+
+
 def self_test():
     host = "store.steampowered.com"
     payload = b"\x01\x00\x00\x50" + b"x" * 20 + host.encode() + b"y" * 20
@@ -169,6 +201,7 @@ def self_test():
     assert host.encode() not in b"".join(parts)
     assert is_steam("store.steampowered.com") and is_steam("steamcommunity.com")
     assert not is_steam("evilsteampowered.com") and not is_steam("google.com")
+    assert startup_command().endswith(" --minimized") and startup_command().startswith('"')
     print("self-test OK")
 
 
@@ -189,7 +222,7 @@ class App:
     """Small window with a Start/Stop button plus a tray icon; minimizing hides the window to the tray.
     The proxy runs on an asyncio loop in a background thread."""
 
-    def __init__(self):
+    def __init__(self, minimized=False):
         self.loop = asyncio.new_event_loop()
         threading.Thread(target=self.loop.run_forever, daemon=True).start()
         self.server = None
@@ -202,7 +235,12 @@ class App:
         self.status = tk.Label(self.root, width=44, pady=12, font=("Segoe UI", 10))
         self.status.pack(padx=16, pady=(12, 0))
         self.button = tk.Button(self.root, width=14, font=("Segoe UI", 10), command=self.toggle)
-        self.button.pack(pady=(4, 16))
+        self.button.pack(pady=(4, 8))
+        self.startup = tk.BooleanVar(value=get_startup())
+        tk.Checkbutton(self.root, text="Run at Windows startup", variable=self.startup,
+                       font=("Segoe UI", 9), command=self.apply_startup).pack(pady=(0, 12))
+        if self.startup.get():
+            set_startup(True)  # refresh the saved path in case the exe was moved
         self.root.protocol("WM_DELETE_WINDOW", self.quit)
         self.root.bind("<Unmap>", self.on_unmap)
 
@@ -212,6 +250,8 @@ class App:
             pystray.MenuItem("Show", lambda: self.actions.put(self.show), default=True),
             pystray.MenuItem(lambda item: "Stop" if self.server else "Start",
                              lambda: self.actions.put(self.toggle)),
+            pystray.MenuItem("Run at Windows startup", lambda: self.actions.put(self.toggle_startup),
+                             checked=lambda item: self.startup.get()),
             pystray.MenuItem("Quit", lambda: self.actions.put(self.quit)),
         ))
         # start() first: pystray caches the icon it shows first and misses a change made during setup,
@@ -219,6 +259,8 @@ class App:
         self.start()
         if self.alive:
             self.tray.run_detached()
+            if minimized:
+                self.root.withdraw()
             self.poll()
 
     def poll(self):
@@ -272,6 +314,14 @@ class App:
     def toggle(self):
         self.stop() if self.server else self.start()
 
+    def apply_startup(self):
+        set_startup(self.startup.get())
+        self.tray.update_menu()
+
+    def toggle_startup(self):
+        self.startup.set(not self.startup.get())
+        self.apply_startup()
+
     def quit(self):
         self.stop()
         self.tray.stop()
@@ -283,6 +333,6 @@ if __name__ == "__main__":
     if "--test" in sys.argv:
         self_test()
     else:
-        app = App()
+        app = App(minimized="--minimized" in sys.argv)
         if app.alive:
             app.root.mainloop()

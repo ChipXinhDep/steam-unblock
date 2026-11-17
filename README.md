@@ -34,7 +34,7 @@ Nếu đúng như vậy, nhiều khả năng nhà mạng đang chặn Steam theo
 
 - Bấm nút thu nhỏ (–): cửa sổ ẩn xuống khay hệ thống, app vẫn chạy.
 - Biểu tượng **ổ khóa mở trên nền xanh** = đang chạy, **ổ khóa đóng trên nền xám** = đã dừng.
-- **Bấm** vào biểu tượng để mở lại cửa sổ. **Chuột phải** để chọn **Show / Stop (Start) / Quit**.
+- **Bấm** vào biểu tượng để mở lại cửa sổ. **Chuột phải** để chọn **Show / Stop (Start) / Run at Windows startup / Quit**.
 - Trên Windows 11, biểu tượng có thể nằm trong mục **^** (ẩn). Kéo nó ra thanh taskbar nếu muốn luôn thấy.
 
 ### Tắt app
@@ -44,7 +44,14 @@ Khi app tắt, Steam Store lại bị chặn như trước. Muốn dùng Store t
 
 ### Tự chạy cùng Windows (tùy chọn)
 
-Nhấn `Win + R`, gõ `shell:startup`, Enter, rồi đặt một shortcut của `SteamUnblock.exe` vào thư mục vừa mở.
+Tích ô **Run at Windows startup** trong cửa sổ app (hoặc chọn mục này trong menu chuột phải ở khay hệ thống).
+Từ lần đăng nhập Windows sau, app tự chạy và **ẩn luôn dưới khay hệ thống**, không hiện cửa sổ.
+
+- Bỏ tích để tắt.
+- Nếu di chuyển file `SteamUnblock.exe` sang chỗ khác, chỉ cần chạy app một lần ở chỗ mới, đường dẫn sẽ tự cập nhật.
+- **Trước khi xóa** `SteamUnblock.exe`, hãy bỏ tích ô này để Windows không còn tìm chạy file đã xóa.
+- App lưu tùy chọn này ở mục `SteamUnblock` trong `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
+  (chỉ cho tài khoản của bạn, không cần quyền Admin).
 
 ## Cách hoạt động
 

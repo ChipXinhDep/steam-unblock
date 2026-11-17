@@ -32,7 +32,12 @@ The proxy also refuses any request that is not for those domains.
 1. Download `SteamUnblock.exe` from [Releases](../../releases) and run it.
 2. Restart Steam once.
 3. Minimize to send it to the tray (open padlock on green = running, closed padlock on gray = stopped).
-   Right-click the tray icon for Show / Stop / Quit.
+   Right-click the tray icon for Show / Stop / Run at Windows startup / Quit.
+4. Optional: tick **Run at Windows startup** (in the window or the tray menu). The app then starts
+   at login, hidden in the tray. It saves a `SteamUnblock` value under
+   `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` (current user only, no admin).
+   If you move the exe, run it once from the new place to update the path.
+   Untick it before deleting the exe.
 
 **What it changes on your PC:** while running, it sets the Windows "automatic proxy
 setup script" (`AutoConfigURL` under `HKCU\...\Internet Settings`). Stopping or closing
